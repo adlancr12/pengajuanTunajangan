@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Pengajuan Tunjangan</title>
+    <style>
+        :root {
+            --primary-color: #e67e22; 
+            --primary-dark: #d35400;
+            --secondary-color: #fff5eb;
+            --accent-color: #e74c3c;
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --bg-body: #f7f1e3;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-body); 
+            padding: 20px; 
+            color: var(--text-main);
+        }
+
+        .container { 
+            max-width: 950px; 
+            margin: 0 auto; 
+            background: #fff; 
+            padding: 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+        }
+
+        .profile-section {
+            background: var(--secondary-color);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group { 
+            display: flex; 
+            flex-direction: column; 
+            margin-bottom: 15px; 
+        }
+
+        .form-group label { 
+            font-weight: 600; 
+            font-size: 12px; 
+            margin-bottom: 5px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .form-group input, .form-group select, .form-group textarea { 
+            padding: 10px 12px; 
+            border: 1px solid #ced4da; 
+            border-radius: 8px; 
+            font-size: 14px; 
+        }
+
+        .form-group input[readonly] { background-color: #eee; }
+
+        .section-header { 
+            background: var(--primary-color); 
+            color: white; 
+            padding: 12px; 
+            border-radius: 8px; 
+            margin: 25px 0 15px 0; 
+            font-weight: bold; 
+        }
+
+        .sub-header {
+            color: var(--primary-dark);
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+        .mandatory { color: var(--accent-color); font-weight: bold; }
+        .status-tag { font-size: 11px; font-style: italic; color: var(--accent-color); margin-top: 2px; }
+
+        button { 
+            width: 100%; padding: 15px; background: var(--primary-color); 
+            color: white; border: none; border-radius: 8px; 
+            font-weight: bold; cursor: pointer; margin-top: 20px;
+        }
+
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header style="text-align:center; margin-bottom:30px;">
+        <h2 style="color: var(--primary-dark);">Form Pengajuan Tunjangan</h2>
+    </header>
+
+    <div class="profile-section">
+        <div class="form-group"><label>Nama</label><input type="text" id="auto_nama" readonly></div>
+        <div class="form-group"><label>NPP</label><input type="text" id="auto_npp" readonly></div>
+        <div class="form-group"><label>Jenjang</label><input type="text" id="auto_jenjang" readonly></div>
+        <div class="form-group"><label>Wilayah</label><input type="text" id="auto_wilayah" readonly></div>
+        <div class="form-group full-width"><label>Penempatan</label><input type="text" id="auto_penempatan" readonly></div>
+    </div>
+
+    <div class="form-group" style="border: 2px solid var(--primary-color); padding: 15px; border-radius: 12px;">
+        <label>Jenis Pengajuan <span class="mandatory">*</span></label>
+        <select id="jenis" onchange="toggleForm()">
+            <option value="">-- Pilih Jenis Pengajuan --</option>
+            <option value="TTT">Tunjangan Tempat Tinggal (TTT)</option>
+            <option value="PTTT">Pembayaran Tunjangan Tempat Tinggal (PTTT)</option>
+        </select>
+    </div>
+
+    <div id="formContent"></div>
+
+    <button type="button" onclick="alert('Data dikirim!')">Submit Pengajuan</button>
+</div>
+
+<script>
+    const dataPegawai = {
+        nama: "Budi Santoso", npp: "123456", jenjang: "ASM", wilayah: "Wilayah 01", penempatan: "KC Jakarta Utama"
+    };
+
+    const dataAlamatTTT = {
+        ktp: { prov: "Jawa Barat", kota: "Bandung", kec: "Cicendo", kel: "Pasirkaliki", alamat: "Jl. Kebon Kawung No. 10" },
+        kost: { prov: "DKI Jakarta", kota: "Jakarta Selatan", kec: "Tebet", kel: "Kebon Baru", alamat: "Kost Hijau, Blok C No. 5", jarak: "3.5 KM", tlp: "0812-9988-7766" }
+    };
+
+    window.onload = () => {
+        document.getElementById('auto_nama').value = dataPegawai.nama;
+        document.getElementById('auto_npp').value = dataPegawai.npp;
+        document.getElementById('auto_jenjang').value = dataPegawai.jenjang;
+        document.getElementById('auto_wilayah').value = dataPegawai.wilayah;
+        document.getElementById('auto_penempatan').value = dataPegawai.penempatan;
+    };
+
+    function toggleForm() {
+        const jenis = document.getElementById('jenis').value;
+        const container = document.getElementById('formContent');
+        container.innerHTML = "";
+
+        if (jenis === "TTT") {
+            container.innerHTML = `
+                <div class="fade-in">
+                    <div class="section-header">Pengajuan Tunjangan Tempat Tinggal (TTT)</div>
+                    <div class="sub-header">Alamat Domisili KTP</div>
+                    <div class="grid">
+                        <div class="form-group"><label>Provinsi <span class="mandatory">*</span></label><select required><option>Pilih Provinsi</option></select></div>
+                        <div class="form-group"><label>Kabupaten/Kota <span class="mandatory">*</span></label><select required><option>Pilih Kota</option></select></div>
+                        <div class="form-group"><label>Kecamatan <span class="mandatory">*</span></label><select required><option>Pilih Kecamatan</option></select></div>
+                        <div class="form-group"><label>Kelurahan <span class="mandatory">*</span></label><select required><option>Pilih Kelurahan</option></select></div>
+                        <div class="form-group full-width"><label>Alamat <span class="mandatory">*</span></label><textarea required rows="2"></textarea></div>
+                    </div>
+                    <div class="sub-header">Alamat Kost</div>
+                    <div class="grid">
+                        <div class="form-group"><label>Provinsi <span class="mandatory">*</span></label><select required><option>Pilih Provinsi</option></select></div>
+                        <div class="form-group"><label>Kabupaten/Kota <span class="mandatory">*</span></label><select required><option>Pilih Kota</option></select></div>
+                        <div class="form-group"><label>Kecamatan <span class="mandatory">*</span></label><select required><option>Pilih Kecamatan</option></select></div>
+                        <div class="form-group"><label>Kelurahan <span class="mandatory">*</span></label><select required><option>Pilih Kelurahan</option></select></div>
+                        <div class="form-group full-width"><label>Alamat <span class="mandatory">*</span></label><textarea required rows="2"></textarea></div>
+                        <div class="form-group"><label>Jarak <span class="mandatory">*</span></label><input type="text" required></div>
+                        <div class="form-group"><label>No Telepon Pemilik Kost <span class="mandatory">*</span></label><input type="text" required></div>
+                    </div>
+                    <div class="sub-header">Upload Dokumen</div>
+                    <div class="grid">
+                        <div class="form-group"><label>Surat Persetujuan Pengajuan <span class="mandatory">*</span></label><input type="file" required></div>
+                        <div class="form-group"><label>Foto Background Kamar Kost <span class="mandatory">*</span></label><input type="file" required></div>
+                        <div class="form-group"><label>Foto depan kost <span class="mandatory">*</span></label><input type="file" required></div>
+                        <div class="form-group"><label>Foto Google Maps <span class="mandatory">*</span></label><input type="file" required></div>
+                    </div>
+                    <div class="form-group full-width"><label>Keterangan</label><textarea rows="2" placeholder="Input Free Text (Tidak Mandatory)"></textarea></div>
+                </div>`;
+        } else if (jenis === "PTTT") {
+            container.innerHTML = `
+                <div class="fade-in">
+                    <div class="section-header">Pembayaran Tunjangan Tempat Tinggal (PTTT)</div>
+                    <div class="sub-header">Data Alamat KTP (Autofill dari TTT)</div>
+                    <div class="grid">
+                        <div class="form-group"><label>Provinsi</label><input type="text" value="${dataAlamatTTT.ktp.prov}" readonly></div>
+                        <div class="form-group"><label>Kabupaten/Kota</label><input type="text" value="${dataAlamatTTT.ktp.kota}" readonly></div>
+                        <div class="form-group"><label>Kecamatan</label><input type="text" value="${dataAlamatTTT.ktp.kec}" readonly></div>
+                        <div class="form-group"><label>Kelurahan</label><input type="text" value="${dataAlamatTTT.ktp.kel}" readonly></div>
+                        <div class="form-group full-width"><label>Alamat</label><input type="text" value="${dataAlamatTTT.ktp.alamat}" readonly></div>
+                    </div>
+                    <div class="sub-header">Data Alamat Kost (Autofill dari TTT)</div>
+                    <div class="grid">
+                        <div class="form-group"><label>Provinsi</label><input type="text" value="${dataAlamatTTT.kost.prov}" readonly></div>
+                        <div class="form-group"><label>Kabupaten/Kota</label><input type="text" value="${dataAlamatTTT.kost.kota}" readonly></div>
+                        <div class="form-group"><label>Kecamatan</label><input type="text" value="${dataAlamatTTT.kost.kec}" readonly></div>
+                        <div class="form-group"><label>Kelurahan</label><input type="text" value="${dataAlamatTTT.kost.kel}" readonly></div>
+                        <div class="form-group full-width"><label>Alamat</label><input type="text" value="${dataAlamatTTT.kost.alamat}" readonly></div>
+                        <div class="form-group"><label>Jarak</label><input type="text" value="${dataAlamatTTT.kost.jarak}" readonly></div>
+                        <div class="form-group"><label>No Telepon Pemilik Kost</label><input type="text" value="${dataAlamatTTT.kost.tlp}" readonly></div>
+                    </div>
+                    <div class="sub-header">Informasi Pembayaran</div>
+                    <div class="grid">
+                        <div class="form-group"><label>Periode Pembayaran <span class="mandatory">*</span></label><select required><option>Pilih Bulan</option></select></div>
+                        <div class="form-group"><label>Nominal Kuitansi (Rp) <span class="mandatory">*</span></label><input type="text" required></div>
+                    </div>
+                    <div class="sub-header">Upload Berkas Pendukung (Sesuai Gambar)</div>
+                    <div class="grid">
+                        <div class="form-group"><label>Surat Pengajuan Pembayaran</label><input type="file" required><span class="status-tag">Mandatory</span></div>
+                        <div class="form-group"><label>Kwitansi Asli</label><input type="file" required><span class="status-tag">Mandatory</span></div>
+                        <div class="form-group"><label>Bukti Transfer</label><input type="file" required><span class="status-tag">Mandatory</span></div>
+                        <div class="form-group"><label>Foto Google Maps</label><input type="file" required><span class="status-tag">Mandatory</span></div>
+                        <div class="form-group"><label>Foto Background Kamar Kost</label><input type="file" required><span class="status-tag">Mandatory</span></div>
+                        <div class="form-group"><label>Foto Depan Kost</label><input type="file" required><span class="status-tag">Mandatory</span></div>
+                    </div>
+                    <div class="sub-header">Catatan</div>
+                    <div class="form-group full-width"><label>Remark</label><select><option>-- Pilih Remark --</option><option>Lancar</option><option>Pindah Lokasi</option></select></div>
+                    <div class="form-group full-width"><label>Keterangan Tambahan (Freetext)</label><textarea rows="3"></textarea></div>
+                </div>`;
+        }
+    }
+</script>
+</body>
+</html>
